@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electrical Design Studio — Solar • Battery • SLD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Electrical Design Studio</h1>
+  <p>Solar • Battery • Electrical Calculations • SLD</p>
+</header>
+
+<nav class="tabbar">
+  <button class="active" data-tab="tab-design">Auto Design</button>
+  <button data-tab="tab-solar">Solar &amp; Battery</button>
+  <button data-tab="tab-calc">Calculations</button>
+  <button data-tab="tab-sld">SLD Editor</button>
+</nav>
+
+<main>
+
+<!-- ============ AUTO DESIGN ============ -->
+<section id="tab-design" class="tab active">
+  <div class="card">
+    <h3>Project Requirements — လိုအပ်ချက်များ ဖြည့်ပါ</h3>
+    <div class="grid2">
+      <div>
+        <label>AC System Voltage</label>
+        <select id="dAC">
+          <option value="230">230 V (1φ)</option>
+          <option value="400" selected>400 V (3φ)</option>
+        </select>
+      </div>
+      <div>
+        <label>Diversity / Demand Factor (%)</label>
+        <input id="dDiv" type="number" step="5" min="1" max="100" value="80">
+      </div>
+      <div>
+        <label>Grid Source</label>
+        <select id="dGrid">
+          <option value="1" selected>ပါဝင်သည်</option>
+          <option value="0">မပါဝင်ပါ</option>
+        </select>
+      </div>
+      <div>
+        <label>Transformer (HV → LV)</label>
+        <select id="dTR">
+          <option value="0">မလိုအပ်ပါ</option>
+          <option value="1">လိုအပ်သည်</option>
+        </select>
+      </div>
+      <div>
+        <label>Solar System</label>
+        <select id="dSolar">
+          <option value="1" selected>ပါဝင်သည် (Hybrid)</option>
+          <option value="0">မပါဝင်ပါ</option>
+        </select>
+      </div>
+      <div>
+        <label>System Style</label>
+        <select id="dStyle">
+          <option value="sigen" selected>Sigenergy SigenStor (DC-coupled Hybrid)</option>
+          <option value="generic">Generic (Charge Controller + Battery Bank)</option>
+        </select>
+      </div>
+    </div>
+
+    <h3 style="margin-top:16px">Solar / Battery Parameters</h3>
+    <div class="grid2">
+      <div>
+        <label>Peak Sun Hours (နာရီ)</label>
+        <input id="dSun" type="number" step="0.1" min="0" value="4.5">
+      </div>
+      <div>
+        <label>Panel Watt (W)</label>
+        <input id="dPanel" type="number" step="1" min="0" value="550">
+      </div>
+      <div>
+        <label>System Derate (%)</label>
+        <input id="dDerate" type="number" step="1" min="1" max="100" value="80">
+      </div>
+      <div>
+        <label>DC System Voltage (V) — စိတ်ကြိုက် ဂဏန်းထည့်ပါ</label>
+        <input id="dSysV" type="number" step="0.1" min="1" value="48">
+      </div>
+      <div>
+        <label>Battery Unit Voltage (V)</label>
+        <input id="dUnitV" type="number" step="0.1" min="1" value="12">
+      </div>
+      <div>
+        <label>Battery Unit Capacity Unit</label>
+        <select id="dUnitMode">
+          <option value="ah" selected>Ah</option>
+          <option value="kwh">kWh</option>
+        </select>
+      </div>
+      <div>
+        <label>Battery Unit Capacity (Ah သို့ kWh)</label>
+        <input id="dUnitCap" type="number" step="1" min="0" value="200">
+      </div>
+      <div>
+        <label>Battery Module Size (kWh) — SigenStor</label>
+        <input id="dModKwh" type="number" step="0.1" min="1" value="8">
+      </div>
+      <div>
+        <label>DoD (%)</label>
+        <input id="dDod" type="number" step="1" min="1" max="100" value="80">
+      </div>
+      <div>
+        <label>Autonomy Days (ရက်)</label>
+        <input id="dDays" type="number" step="0.5" min="0.5" value="1">
+      </div>
+    </div>
+
+    <h3 style="margin-top:16px">Manual Design — ကိုယ့် datasheet အတိအကျ ဂဏန်းများ</h3>
+    <div class="grid2">
+      <div>
+        <label>Manual Override</label>
+        <select id="dManual">
+          <option value="0">မလုပ်ပါ (App က အလိုအလျောက် တွက်မည်)</option>
+          <option value="1">လုပ်မည် (ကိုယ့်ဂဏန်းများ အသုံးပြုမည်)</option>
+        </select>
+      </div>
+      <div>
+        <label>PV Array Size (kWp)</label>
+        <input id="dManPv" type="number" step="0.1" min="0" value="20">
+      </div>
+      <div>
+        <label>Battery Total (kWh)</label>
+        <input id="dManBkwh" type="number" step="0.1" min="0" value="24">
+      </div>
+      <div>
+        <label>Inverter Size (kW)</label>
+        <input id="dManInv" type="number" step="0.1" min="0" value="10">
+      </div>
+    </div>
+
+    <h3 style="margin-top:16px">Load List — လျှပ်စစ်ဝန်များ</h3>
+    <div class="load-head">
+      <span>Load Name</span><span>kW</span><span>Qty</span><span>PF</span><span>Phase</span><span>Hours/day</span><span></span>
+    </div>
+    <div id="loadRows"></div>
+    <p style="margin-top:8px"><button id="addLoad" class="btn ghost small">+ Load ထည့်မည်</button></p>
+
+    <p style="margin-top:14px">
+      <button id="designBtn" class="btn">တွက်ချက်မည် (Design)</button>
+      <button id="drawBtn" class="btn ghost">SLD ဆွဲပေးမည်</button>
+    </p>
+    <div id="designOut" class="results"></div>
+  </div>
+</section>
+
+<!-- ============ SOLAR & BATTERY ============ -->
+<section id="tab-solar" class="tab">
+  <div class="card">
+    <h3>Solar System Sizing</h3>
+    <div class="grid2">
+      <div>
+        <label>နေ့စဉ် လျှပ်စစ်သုံးစွဲမှု (kWh/day)</label>
+        <input id="solLoad" type="number" step="0.1" min="0" value="10">
+      </div>
+      <div>
+        <label>Peak Sun Hours (နာရီ)</label>
+        <input id="solSun" type="number" step="0.1" min="0" value="4.5">
+      </div>
+      <div>
+        <label>Panel တစ်ခု၏ Watt (W)</label>
+        <input id="solPanel" type="number" step="1" min="0" value="550">
+      </div>
+      <div>
+        <label>System Derate / Loss (%)</label>
+        <input id="solDerate" type="number" step="1" min="1" max="100" value="80">
+      </div>
+      <div>
+        <label>System Voltage (V) — စိတ်ကြိုက် ဂဏန်း</label>
+        <input id="solVolt" type="number" step="0.1" min="1" value="48">
+      </div>
+      <div>
+        <label>Peak Load (kW)</label>
+        <input id="solPeak" type="number" step="0.1" min="0" value="3">
+      </div>
+    </div>
+    <h3 style="margin-top:16px">Battery Bank</h3>
+    <div class="grid2">
+      <div>
+        <label>Battery Unit Voltage (V)</label>
+        <input id="solBattV" type="number" step="1" min="1" value="12">
+      </div>
+      <div>
+        <label>Battery Unit Capacity (Ah)</label>
+        <input id="solBattAh" type="number" step="1" min="1" value="200">
+      </div>
+      <div>
+        <label>Depth of Discharge — DoD (%)</label>
+        <input id="solDod" type="number" step="1" min="1" max="100" value="80">
+      </div>
+      <div>
+        <label>Autonomy Days (မိုးရှိုင်းရက် / အရန်ရက်)</label>
+        <input id="solDays" type="number" step="0.5" min="0.5" value="1">
+      </div>
+    </div>
+    <p style="margin-top:14px"><button id="solarBtn" class="btn">တွက်ချက်မည် (Calculate)</button></p>
+    <div id="solarOut" class="results"></div>
+  </div>
+</section>
+
+<!-- ============ CALCULATIONS ============ -->
+<section id="tab-calc" class="tab">
+  <div class="card">
+    <h3>Cable Sizing (Voltage Drop)</h3>
+    <div class="grid2">
+      <div>
+        <label>Load Current (A)</label>
+        <input id="cabI" type="number" step="1" min="0" value="32">
+      </div>
+      <div>
+        <label>Phase</label>
+        <select id="cabPhase">
+          <option value="1">Single Phase (1φ)</option>
+          <option value="3" selected>Three Phase (3φ)</option>
+        </select>
+      </div>
+      <div>
+        <label>System Voltage (V)</label>
+        <input id="cabV" type="number" step="1" min="1" value="400">
+      </div>
+      <div>
+        <label>Cable Length (m)</label>
+        <input id="cabL" type="number" step="1" min="0" value="50">
+      </div>
+      <div>
+        <label>ခွင့်ပြု Voltage Drop (%)</label>
+        <input id="cabDrop" type="number" step="0.5" min="0.1" value="3">
+      </div>
+      <div>
+        <label>Conductor</label>
+        <select id="cabMat">
+          <option value="cu" selected>Copper</option>
+          <option value="al">Aluminium</option>
+        </select>
+      </div>
+    </div>
+    <p style="margin-top:14px"><button id="cableBtn" class="btn">တွက်ချက်မည်</button></p>
+    <div id="cableOut" class="results"></div>
+  </div>
+
+  <div class="card">
+    <h3>Breaker Sizing</h3>
+    <div class="grid2">
+      <div>
+        <label>Load Power (kW)</label>
+        <input id="brkP" type="number" step="0.1" min="0" value="15">
+      </div>
+      <div>
+        <label>System Voltage (V)</label>
+        <input id="brkV" type="number" step="1" min="1" value="400">
+      </div>
+      <div>
+        <label>Phase</label>
+        <select id="brkPhase">
+          <option value="1">Single Phase (1φ)</option>
+          <option value="3" selected>Three Phase (3φ)</option>
+        </select>
+      </div>
+      <div>
+        <label>Power Factor</label>
+        <input id="brkPF" type="number" step="0.05" min="0.1" max="1" value="0.8">
+      </div>
+    </div>
+    <p style="margin-top:14px"><button id="brkBtn" class="btn">တွက်ချက်မည်</button></p>
+    <div id="brkOut" class="results"></div>
+  </div>
+
+  <div class="card">
+    <h3>Power &amp; Reactive Power (P • S • Q)</h3>
+    <div class="grid2">
+      <div>
+        <label>Voltage (V)</label>
+        <input id="pwV" type="number" step="1" min="1" value="400">
+      </div>
+      <div>
+        <label>Current (A)</label>
+        <input id="pwI" type="number" step="1" min="0" value="50">
+      </div>
+      <div>
+        <label>Phase</label>
+        <select id="pwPhase">
+          <option value="1">Single Phase (1φ)</option>
+          <option value="3" selected>Three Phase (3φ)</option>
+        </select>
+      </div>
+      <div>
+        <label>Power Factor</label>
+        <input id="pwPF" type="number" step="0.05" min="0.1" max="1" value="0.8">
+      </div>
+    </div>
+    <p style="margin-top:14px"><button id="pwBtn" class="btn">တွက်ချက်မည်</button></p>
+    <div id="pwOut" class="results"></div>
+  </div>
+
+  <div class="card">
+    <h3>Power Factor Correction (Capacitor Bank)</h3>
+    <div class="grid2">
+      <div>
+        <label>Real Power P (kW)</label>
+        <input id="pfP" type="number" step="1" min="0" value="100">
+      </div>
+      <div>
+        <label>လက်ရှိ Power Factor</label>
+        <input id="pfCur" type="number" step="0.01" min="0.1" max="1" value="0.75">
+      </div>
+      <div>
+        <label>ပန်းတိုင် Power Factor</label>
+        <input id="pfTar" type="number" step="0.01" min="0.1" max="1" value="0.95">
+      </div>
+    </div>
+    <p style="margin-top:14px"><button id="pfBtn" class="btn">တွက်ချက်မည်</button></p>
+    <div id="pfOut" class="results"></div>
+  </div>
+
+  <div class="card">
+    <h3>Transformer Sizing</h3>
+    <div class="grid2">
+      <div>
+        <label>Load (kW)</label>
+        <input id="trP" type="number" step="1" min="0" value="80">
+      </div>
+      <div>
+        <label>Power Factor</label>
+        <input id="trPF" type="number" step="0.05" min="0.1" max="1" value="0.8">
+      </div>
+      <div>
+        <label>Future Growth (%)</label>
+        <input id="trG" type="number" step="5" min="0" value="25">
+      </div>
+    </div>
+    <p style="margin-top:14px"><button id="trBtn" class="btn">တွက်ချက်မည်</button></p>
+    <div id="trOut" class="results"></div>
+  </div>
+</section>
+
+<!-- ============ SLD EDITOR ============ -->
+<section id="tab-sld" class="tab">
+  <div class="card">
+    <h3>Single Line Diagram Editor</h3>
+    <div id="palette" class="sld-toolbar"></div>
+    <div class="sld-toolbar">
+      <button id="delNode" class="btn ghost small">ဖျက်မည် (Delete)</button>
+      <button id="saveSld" class="btn ghost small">Save</button>
+      <button id="loadSld" class="btn ghost small">Load</button>
+      <button id="expSvg" class="btn ghost small">Export SVG</button>
+      <button id="clrAll" class="btn ghost small">Clear All</button>
+      <span id="sldMsg" class="hint"></span>
+    </div>
+    <div class="sld-canvas">
+      <svg id="sldSvg" viewBox="0 0 1200 900"></svg>
+    </div>
+    <p class="hint">
+      Symbol တစ်ခုကို နှိပ်ပြီး diagram ပေါ်သို့ ထည့်ပါ •
+      Symbol ကို drag ဖြင့် ရွှေ့ပါ •
+      Port (စက်ဝိုင်း) နှစ်ခုကို တစ်ခုချင်း နှိပ်၍ wire ဆက်ပါ •
+      Symbol ပေါ် double-click နှိပ်၍ label ပြင်ပါ •
+      Delete key ဖြင့် ရွေးချယ်ထားသည့် symbol ကို ဖျက်နိုင်ပါသည်
+    </p>
+  </div>
+</section>
+
+</main>
+
+<script src="calc.js"></script>
+<script src="sld.js"></script>
+<script src="design.js"></script>
+</body>
+</html>
